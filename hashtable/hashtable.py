@@ -1,3 +1,70 @@
+
+
+from fnvhash import fnv1_64
+
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+    def __repr__(self):
+        return self
+
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def __repr__(self):
+        curStr = ""
+        curr = self.head
+        while curr is not None:
+            curStr += f'{str(curr.value)} ->'
+            curr = curr.next
+        return curStr
+
+    def insert_at_head(self,node):
+        
+        node.next = self.head
+        self.head = node
+
+    def insert_at_head_or_overwrite(self,node):
+        existingNode = self.find(node.value)
+        if existingNode is not None:
+            existingNode.value = node.value
+        else:
+            self.insert_at_head(node)
+
+    def delete(self,value):
+        curr = self.head
+
+        if curr.value == value:
+            self.head = curr.next
+            return curr
+        
+        prev = curr
+        curr = curr.next
+
+        while curr is not None:
+            if curr.value == value:
+                prev.next = curr.next
+                curr.next = None
+                return curr
+            else:
+                prev = curr
+                curr = curr.next
+
+        return None
+
+    def find(self,value):
+        curr = self.head
+        while curr is not None:
+            if curr.value == value:
+                return curr
+            curr = curr.next
+        return None
+
+
 class HashTableEntry:
     """
     Linked List hash table key/value pair
@@ -22,7 +89,13 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.capacity = capacity
+        self.arr = [LinkedList()] * capacity
+        #for i in capacity:
+        #    self.arr[i] = LinkedList()
+        #print(self.arr)
+        #choosing FNV-1 for hashing algorithm due to it having fewer collisions
+        #and better hash distribution
 
     def get_num_slots(self):
         """
@@ -52,8 +125,18 @@ class HashTable:
 
         Implement this, and/or DJB2.
         """
-
+        instring = key.encode()
+        #FNV_prime = (2^40) + (2^8) + 0xb3
         # Your code here
+        #key = self.key
+        #h = key
+        #for char in key:
+        #    h = h * FNV_prime    
+            #h = h "xor octet of data"
+        #return h
+        #print(fnv1_64(instring))
+        return fnv1_64(instring)
+        
 
 
     def djb2(self, key):
@@ -70,8 +153,9 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        
+        return self.fnv1(key) % self.capacity
+        #return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
@@ -82,6 +166,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hash_index = self.hash_index(key)
+        #self.arr[hash_index] = value
+        #print(f'my_array{self.arr}')
+        self.arr[hash_index].insert_at_head_or_overwrite(Node(value))
+        
 
 
     def delete(self, key):
@@ -93,6 +182,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hash_index = self.hash_index(key)
+        if self.hash_index(key) is not None:
+            self.arr[hash_index] = None
+        else:
+            print('Key could not be found')
+        
 
 
     def get(self, key):
@@ -104,6 +199,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hash_index = self.hash_index(key)
+        if self.arr[hash_index] is not None:
+            return self.arr[hash_index]
+        else:
+            return None
+        
 
 
     def resize(self, new_capacity):
@@ -151,3 +252,10 @@ if __name__ == "__main__":
         print(ht.get(f"line_{i}"))
 
     print("")
+
+
+a = HashTable(8)
+#a.put('today',140)
+#b = a.hash_index("line_1")
+
+#print (b)
