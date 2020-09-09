@@ -2,68 +2,6 @@
 
 from fnvhash import fnv1_64
 
-class Node:
-    def __init__(self, value):
-        self.value = value
-        self.next = None
-
-    def __repr__(self):
-        return self
-
-
-class LinkedList:
-    def __init__(self):
-        self.head = None
-
-    def __repr__(self):
-        curStr = ""
-        curr = self.head
-        while curr is not None:
-            curStr += f'{str(curr.value)} ->'
-            curr = curr.next
-        return curStr
-
-    def insert_at_head(self,node):
-        
-        node.next = self.head
-        self.head = node
-
-    def insert_at_head_or_overwrite(self,node):
-        existingNode = self.find(node.value)
-        if existingNode is not None:
-            existingNode.value = node.value
-        else:
-            self.insert_at_head(node)
-
-    def delete(self,value):
-        curr = self.head
-
-        if curr.value == value:
-            self.head = curr.next
-            return curr
-        
-        prev = curr
-        curr = curr.next
-
-        while curr is not None:
-            if curr.value == value:
-                prev.next = curr.next
-                curr.next = None
-                return curr
-            else:
-                prev = curr
-                curr = curr.next
-
-        return None
-
-    def find(self,value):
-        curr = self.head
-        while curr is not None:
-            if curr.value == value:
-                return curr
-            curr = curr.next
-        return None
-
 
 class HashTableEntry:
     """
@@ -73,7 +11,10 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+        
 
+    def __repr__(self):
+        return f'key is {self.key}, value is {self.value}'
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -90,12 +31,16 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.capacity = capacity
-        self.arr = [LinkedList()] * capacity
+        self.arr = [None] * capacity
+        self.size = 0
         #for i in capacity:
-        #    self.arr[i] = LinkedList()
+            #self.arr[i] = LinkedList()
         #print(self.arr)
         #choosing FNV-1 for hashing algorithm due to it having fewer collisions
         #and better hash distribution
+
+    def __repr__(self):
+        print(f'Hashtable is ->{self.arr}')
 
     def get_num_slots(self):
         """
@@ -165,11 +110,50 @@ class HashTable:
 
         Implement this.
         """
+        """
+        Looking into each index, if the index is empty, insert a node
+        if there is already a node, check the key, if the key matches
+        the current value of the key val pair is replaced
+        """
         # Your code here
         hash_index = self.hash_index(key)
+        hashed_key = self.fnv1(key)
+        node = self.arr[hash_index]
+        while node:
+            if node.key == hashed_key:
+                node.value = value
+            if node.next:
+                node = node.next
+            else:
+                node.next = HashTableEntry(hashed_key, value)
+                return
+        self.arr[hash_index] = HashTableEntry(hashed_key, value)
+        self.size += 1
+        
+        #if self.arr[hash_index]:
+            #node = self.arr[hash_index]
+            #if node.key == hashed_key:
+                #node.value = value
+            #while node.next:
+                #if node.key == hashed_key:
+                    #node.key = key #not sure if this is needed
+                    #node.value = value
+                    
+                #node = node.next
+            #node.next = HashTableEntry(hashed_key,value)
+        #else:
+            #self.arr[hash_index] = HashTableEntry(hashed_key,value)
+            #self.size += 1
         #self.arr[hash_index] = value
         #print(f'my_array{self.arr}')
-        self.arr[hash_index].insert_at_head_or_overwrite(Node(value))
+        
+        #if self.arr[hash_index] == None:
+            #self.arr[hash_index] = Node(key,value)
+        #else:
+            #current = self.arr[hash_index]
+            #while current is not None:
+                
+            
         
 
 
@@ -183,10 +167,34 @@ class HashTable:
         """
         # Your code here
         hash_index = self.hash_index(key)
-        if self.hash_index(key) is not None:
-            self.arr[hash_index] = None
-        else:
-            print('Key could not be found')
+        hashed_key = self.fnv1(key)
+        node = self.arr[hash_index]
+
+        while node:
+            if node.key == hashed_key:
+                node.value = None
+            if node.next:
+                node = node.next
+            else:
+                print(f'No value found with key: {key}')
+        # FIX THIS DELETE FUNCTION TOMORROW
+
+        #if self.arr[hash_index]:
+            #node = self.arr[hash_index]
+            #if node.key == hashed_key:
+                #node.value = None
+            #while node.next:
+                #if node.key == hashed_key:
+                    #node.value = None
+                #node = node.next
+
+        
+
+
+        #if self.hash_index(key) is not None:
+            #self.arr[hash_index] = None
+        #else:
+            #print('Key could not be found')
         
 
 
@@ -198,12 +206,42 @@ class HashTable:
 
         Implement this.
         """
+
+        """
+        to implement the collision version of this, need to access the node
+        and compare the key to the first element stored in the node at the 
+        hash address
+        """
         # Your code here
         hash_index = self.hash_index(key)
-        if self.arr[hash_index] is not None:
-            return self.arr[hash_index]
-        else:
-            return None
+        hashed_key = self.fnv1(key)
+        #if self.arr[hash_index].find(key) == key
+        #if self.arr[hash_index].length > 1:
+
+            #for element in self.arr[hash_index]:
+                #if len(element) == 2 and element[0] == key:
+                   # return element[1]
+                #else:
+                    #return None
+        
+        #print(self.arr[hash_index].find(key[0]))
+        #print (self.arr[hash_index].find(key))
+            #print('found')
+        
+        #return self.arr[hash_index].find(key)
+
+        #if self.arr[hash_index] is not None:
+            #return self.arr[hash_index]
+        #else:
+            #return None
+        
+        if self.arr[hash_index]:
+            node = self.arr[hash_index]
+            while node:
+                if node.key == hashed_key:
+                    #print(f'Node key is {node.key}, Node value is {node.value}')
+                    return node.value
+                node = node.next
         
 
 
@@ -237,25 +275,46 @@ if __name__ == "__main__":
     print("")
 
     # Test storing beyond capacity
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    #for i in range(1, 13):
+    #    print(ht.get(f"line_{i}"))
 
     # Test resizing
-    old_capacity = ht.get_num_slots()
-    ht.resize(ht.capacity * 2)
-    new_capacity = ht.get_num_slots()
+    #old_capacity = ht.get_num_slots()
+    #ht.resize(ht.capacity * 2)
+    #new_capacity = ht.get_num_slots()
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    #print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    #for i in range(1, 13):
+        #print(ht.get(f"line_{i}"))
 
     print("")
 
 
 a = HashTable(8)
-#a.put('today',140)
-#b = a.hash_index("line_1")
 
-#print (b)
+a.put("key-0", "val-0")
+a.put("key-1", "val-1")
+#a.put("key-2", "val-2")
+#a.put("key-3", "val-3")
+#a.put("key-4", "val-4")
+#a.put("key-5", "val-5")
+#a.put("key-6", "val-6")
+#a.put("key-7", "val-7")
+#a.put("key-8", "val-8")
+a.put("key-9", "val-9")
+#print(a)
+
+print('key 1')
+a.get('key-1')
+print('key-9')
+a.get('key-9')
+
+a.put('key-0', 'something else')
+
+print('new key-0 val')
+a.get('key-0')
+a.delete('key 1')
+print('New key-1')
+a.get('key-1')
