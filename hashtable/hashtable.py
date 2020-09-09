@@ -122,6 +122,7 @@ class HashTable:
         while node:
             if node.key == hashed_key:
                 node.value = value
+                return
             if node.next:
                 node = node.next
             else:
@@ -177,6 +178,7 @@ class HashTable:
                 node = node.next
             else:
                 print(f'No value found with key: {key}')
+                return
         # FIX THIS DELETE FUNCTION TOMORROW
 
         #if self.arr[hash_index]:
