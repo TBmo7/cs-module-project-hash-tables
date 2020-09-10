@@ -32,7 +32,8 @@ class HashTable:
         # Your code here
         self.capacity = capacity
         self.arr = [None] * capacity
-        self.size = 0
+        self.elements = 0
+        
         #for i in capacity:
             #self.arr[i] = LinkedList()
         #print(self.arr)
@@ -53,6 +54,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        print(f'Number of slots in current table: {self.capacity}')
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -62,6 +65,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        print(f'Load factor is: {self.elements/self.capacity}')
+        return self.elements/self.capacity
 
 
     def fnv1(self, key):
@@ -117,19 +122,20 @@ class HashTable:
         """
         # Your code here
         hash_index = self.hash_index(key)
-        hashed_key = self.fnv1(key)
+        #hashed_key = self.fnv1(key)
         node = self.arr[hash_index]
         while node:
-            if node.key == hashed_key:
+            if node.key == key:
                 node.value = value
                 return
             if node.next:
                 node = node.next
             else:
-                node.next = HashTableEntry(hashed_key, value)
+                node.next = HashTableEntry(key, value)
+                self.elements += 1
                 return
-        self.arr[hash_index] = HashTableEntry(hashed_key, value)
-        self.size += 1
+        self.arr[hash_index] = HashTableEntry(key, value)
+        self.elements += 1
         
         #if self.arr[hash_index]:
             #node = self.arr[hash_index]
@@ -168,12 +174,13 @@ class HashTable:
         """
         # Your code here
         hash_index = self.hash_index(key)
-        hashed_key = self.fnv1(key)
+        #hashed_key = self.fnv1(key)
         node = self.arr[hash_index]
 
         while node:
-            if node.key == hashed_key:
+            if node.key == key:
                 node.value = None
+                self.elements -= 1
             if node.next:
                 node = node.next
             else:
@@ -216,7 +223,7 @@ class HashTable:
         """
         # Your code here
         hash_index = self.hash_index(key)
-        hashed_key = self.fnv1(key)
+        #hashed_key = self.fnv1(key)
         #if self.arr[hash_index].find(key) == key
         #if self.arr[hash_index].length > 1:
 
@@ -240,7 +247,7 @@ class HashTable:
         if self.arr[hash_index]:
             node = self.arr[hash_index]
             while node:
-                if node.key == hashed_key:
+                if node.key == key:
                     #print(f'Node key is {node.key}, Node value is {node.value}')
                     return node.value
                 node = node.next
@@ -251,10 +258,43 @@ class HashTable:
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
+        if we need to double, then we get load factor size, confirm
+        then we need to create a new hashtable with the new size
+        then we need to go through the old table and pull in the old entries
+        and rehash them into the new table
 
         Implement this.
         """
         # Your code here
+        load_factor = self.get_load_factor()
+
+        if load_factor > 0.7:
+            newer_capacity = new_capacity
+        if load_factor < 0.2:
+            newer_capacity = self.capacity // 2
+        new_hashtable = HashTable(newer_capacity)    
+        for i in self.arr:
+            node = i
+            while node:
+                new_key = node.key
+                new_val = node.value
+                new_hashtable.put(new_key, new_val)
+                node = node.next
+        self.arr = new_hashtable.arr
+        self.capacity = new_hashtable.capacity
+        
+        # 
+        # A different way down below       
+        #new_hashtable = self
+        #self = HashTable(new_capacity)
+        #for i in new_hashtable.arr:
+            #node = i
+            #while node:
+                #new_key = node.key
+                #new_val = node.value
+                #self.put(new_key,new_val)
+                #node = node.next
+        
 
 
 
@@ -276,28 +316,28 @@ if __name__ == "__main__":
 
     print("")
 
-    # Test storing beyond capacity
-    #for i in range(1, 13):
-    #    print(ht.get(f"line_{i}"))
+    #Test storing beyond capacity
+    for i in range(1, 13):
+        print(ht.get(f"line_{i}"))
 
-    # Test resizing
-    #old_capacity = ht.get_num_slots()
-    #ht.resize(ht.capacity * 2)
-    #new_capacity = ht.get_num_slots()
+     #Test resizing
+    old_capacity = ht.get_num_slots()
+    ht.resize(ht.capacity * 2)
+    new_capacity = ht.get_num_slots()
 
-    #print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
-    # Test if data intact after resizing
-    #for i in range(1, 13):
-        #print(ht.get(f"line_{i}"))
+     #Test if data intact after resizing
+    for i in range(1, 13):
+        print(ht.get(f"line_{i}"))
 
     print("")
 
 
-a = HashTable(8)
+#a = HashTable(8)
 
-a.put("key-0", "val-0")
-a.put("key-1", "val-1")
+#a.put("key-0", "val-0")
+#a.put("key-1", "val-1")
 #a.put("key-2", "val-2")
 #a.put("key-3", "val-3")
 #a.put("key-4", "val-4")
@@ -305,18 +345,18 @@ a.put("key-1", "val-1")
 #a.put("key-6", "val-6")
 #a.put("key-7", "val-7")
 #a.put("key-8", "val-8")
-a.put("key-9", "val-9")
+#a.put("key-9", "val-9")
 #print(a)
 
-print('key 1')
-a.get('key-1')
-print('key-9')
-a.get('key-9')
+#print('key 1')
+#a.get('key-1')
+#print('key-9')
+#a.get('key-9')
 
-a.put('key-0', 'something else')
+#a.put('key-0', 'something else')
 
-print('new key-0 val')
-a.get('key-0')
-a.delete('key 1')
-print('New key-1')
-a.get('key-1')
+##print('new key-0 val')
+#a.get('key-0')
+#a.delete('key 1')
+#print('New key-1')
+#a.get('key-1')
