@@ -5,6 +5,7 @@ def word_count(s):
     #words = re.split('\s+',s)
     #x = s.lower()
     #words = x.split()
+    #Had to change regex below to allow apostrophies(sp?)
     x = re.sub("[^0-9a-zA-z']+", ' ', s).rstrip()
     y = x.lower()
     words = y.split(' ')

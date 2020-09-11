@@ -1,8 +1,8 @@
 # Your code here
-import sys
-sys.path.append("./hashtable")
-print(f'system{sys.path}')
-from hashtable import HashTable, HashTableEntry 
+#import sys
+#sys.path.append("./hashtable")
+#print(f'system{sys.path}')
+#from hashtable import HashTable, HashTableEntry 
 
 import math
 import random
